@@ -11,10 +11,13 @@ all: test build
 test:
 	${GOTEST}
 
-build-dev:
+compile-assets:
+	go-bindata -o assets.go -prefix assets/ assets/
+
+build-dev: compile-assets
 	ENV="develop" mkdir -p ./build && ${GOBUILD} -o ./build/${BINARY_NAME}_linux -v *.go
 
-build-linux:
+build-linux: compile-assets
 	mkdir -p ./build && ${GOBUILD} -o ./build/${BINARY_NAME}_linux -v *.go
 
 build: test build-linux

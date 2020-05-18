@@ -1,11 +1,16 @@
 package main
 
 import (
-	"github.com/zserge/webview"
+	"bytes"
+	"io"
 	"log"
+	"mime"
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
+
+	"github.com/zserge/webview"
 )
 
 const (
@@ -23,7 +28,19 @@ func startServer() string {
 	go func() {
 		defer ln.Close()
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte(indexHTML))
+			path := r.URL.Path
+			if len(path) > 0 && path[0] == '/' {
+				path = path[1:]
+			}
+			if path == "" {
+				path = "index.html"
+			}
+			if bs, err := Asset(path); err != nil {
+				w.WriteHeader(http.StatusNotFound)
+			} else {
+				w.Header().Add("Content-Type", mime.TypeByExtension(filepath.Ext(path)))
+				io.Copy(w, bytes.NewBuffer(bs))
+			}
 		})
 		log.Fatal(http.Serve(ln, nil))
 	}()
@@ -47,12 +64,12 @@ func main() {
 	initalizeLog()
 	url := startServer()
 	w := webview.New(webview.Settings{
-		Width:     windowWidth,
-		Height:    windowHeight,
-		Debug:     true,
-		Title:     "InfluxGUI",
-		Resizable: true,
-		URL:       url,
+		Width:                  windowWidth,
+		Height:                 windowHeight,
+		Debug:                  true,
+		Title:                  "InfluxGUI",
+		Resizable:              true,
+		URL:                    url,
 		ExternalInvokeCallback: handleRPC,
 	})
 	w.SetColor(255, 255, 255, 255)
