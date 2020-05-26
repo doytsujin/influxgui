@@ -12,7 +12,7 @@ test:
 	${GOTEST}
 
 compile-assets:
-	go-bindata -o assets.go -prefix assets/ assets/ assets/components/
+	go-bindata -o assets.go -prefix assets/ assets/ assets/components/ assets/media/
 
 build-dev: compile-assets
 	ENV="develop" mkdir -p ./build && ${GOBUILD} -o ./build/${BINARY_NAME}_linux -v *.go
