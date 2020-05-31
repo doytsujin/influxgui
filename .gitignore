@@ -11,6 +11,9 @@
 # go-bindata compiled files
 assets.go
 
+# databasefile
+influxConfigs.db
+
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 

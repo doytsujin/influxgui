@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/boltdb/bolt"
 	"github.com/zserge/webview"
 )
 
@@ -19,6 +20,7 @@ const (
 )
 
 var connectionConfig InfluxDBConnection
+var databaseHandler *bolt.DB
 
 func startServer() string {
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
@@ -62,6 +64,7 @@ func getDebugFlag() bool {
 
 func main() {
 	initalizeLog()
+
 	url := startServer()
 	w := webview.New(webview.Settings{
 		Width:                  windowWidth,
@@ -74,5 +77,7 @@ func main() {
 	})
 	w.SetColor(255, 255, 255, 255)
 	defer w.Exit()
+	db, _ := setupDB(w)
+	databaseHandler = db
 	w.Run()
 }
