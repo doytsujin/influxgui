@@ -10,7 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/boltdb/bolt"
+	"github.com/tidwall/buntdb"
 	"github.com/zserge/webview"
 )
 
@@ -20,7 +20,7 @@ const (
 )
 
 var connectionConfig InfluxDBConnection
-var databaseHandler *bolt.DB
+var databaseHandler *buntdb.DB
 
 func startServer() string {
 	ln, err := net.Listen("tcp", "127.0.0.1:0")

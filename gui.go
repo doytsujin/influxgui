@@ -1,7 +1,9 @@
 package main
 
 import (
+	"container/list"
 	"fmt"
+
 	"github.com/zserge/webview"
 )
 
@@ -219,6 +221,18 @@ func writeHistoryLogs(w webview.WebView, content string) {
 	w.Eval(data)
 }
 
-func createInfluxDBQueryResponse(data string) (string){
+func createInfluxDBQueryResponse(data string) string {
 	return `document.getElementById('query_content').value = "` + data + `";`
+}
+
+func popluateConnections(w webview.WebView, connections *list.List) {
+	data := "window.rpc.setConnections(["
+	for connection := connections.Front(); connection != nil; connection = connection.Next() {
+		option := fmt.Sprintf("'%v'", connection.Value)
+		data = fmt.Sprintf("%s%s,", data, option)
+		//fmt.Printf("connection: %v", connection.Value)
+	}
+	data = fmt.Sprintf("%s]);", data)
+	fmt.Printf("connection cmd: %s", data)
+	w.Eval(data)
 }
