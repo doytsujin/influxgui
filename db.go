@@ -17,18 +17,33 @@ func setupDB(w webview.WebView) (*buntdb.DB, error) {
 }
 
 func addInfluxDBConfig(w webview.WebView, db *buntdb.DB, host string) error {
-	err := db.Update(func(tx *buntdb.Tx) error {
-		_, _, err := tx.Set(host, host, nil)
-		return err
-	})
-	if err != nil {
-		createAlertDialog(w, "Could not save to database", err.Error())
-	} else {
-		if host != "http://localhost:8086" {
-			createAlertDialog(w, "Config saved", host)
+	connections, _ := getInfluxDBConfigs(w, db)
+	exists := false
+	for connection := connections.Front(); connection != nil; connection = connection.Next() {
+		if host == connection.Value {
+			exists = true
 		}
 	}
-	return err
+	if !exists {
+		err := db.Update(func(tx *buntdb.Tx) error {
+			_, _, err := tx.Set(host, host, nil)
+			return err
+		})
+		if err != nil {
+			createAlertDialog(w, "Could not save to database", err.Error())
+		} else {
+			if host != "http://localhost:8086" {
+				createAlertDialog(w, "Config saved", host)
+			}
+		}
+		return err
+	} else {
+		if host != "http://localhost:8086" {
+			createAlertDialog(w, "Hostname exists already", host)
+		}
+	}
+	return nil
+
 }
 
 func getInfluxDBConfigs(w webview.WebView, db *buntdb.DB) (*list.List, error) {
@@ -41,13 +56,5 @@ func getInfluxDBConfigs(w webview.WebView, db *buntdb.DB) (*list.List, error) {
 		})
 		return nil
 	})
-	/*err := db.View(func(tx *buntdb.Tx) error {
-		err := tx.Ascend("", func(key, value string) bool {
-			fmt.Printf("key: %s, value: %s\n", key, value)
-			return false
-		})
-		err = nil
-		return err
-	})*/
 	return connections, err
 }
