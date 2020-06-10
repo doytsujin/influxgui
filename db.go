@@ -24,7 +24,9 @@ func addInfluxDBConfig(w webview.WebView, db *buntdb.DB, host string) error {
 	if err != nil {
 		createAlertDialog(w, "Could not save to database", err.Error())
 	} else {
-		createAlertDialog(w, "Config saved", host)
+		if host != "http://localhost:8086" {
+			createAlertDialog(w, "Config saved", host)
+		}
 	}
 	return err
 }

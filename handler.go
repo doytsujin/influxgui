@@ -7,6 +7,20 @@ import (
 	"github.com/zserge/webview"
 )
 
+func storeConnection(w webview.WebView, host string) {
+	err := addInfluxDBConfig(w, databaseHandler, host)
+	if err != nil {
+		createAlertDialog(w, "could not save", err.Error())
+	}
+	//createAlertDialog(w, "juu", "tesmos")
+	connections, _ := getInfluxDBConfigs(w, databaseHandler)
+	/*fmt.Println("connections: %v", connections)
+	connectionsJSON, _ := json.Marshal(connections)
+	data = fmt.Sprintf("window.connections=%s", connectionsJSON)
+	w.Eval(data)*/
+	popluateConnections(w, connections)
+	//createAlertDialog(w, "Connections", "jee")
+}
 func handleRPC(w webview.WebView, data string) {
 	cmd := struct {
 		Name string `json:"cmd"`
@@ -17,18 +31,16 @@ func handleRPC(w webview.WebView, data string) {
 	}
 	switch cmd.Name {
 	case "connections":
-		err := addInfluxDBConfig(w, databaseHandler, "http://localhost:8086")
-		if err != nil {
-			createAlertDialog(w, "could not save", err.Error())
+		storeConnection(w, "http://localhost:8086")
+	case "addCon":
+		connection := InfluxDBConnection{}
+		if err := json.Unmarshal([]byte(data), &connection); err != nil {
+			createAlertDialog(w, "Could not decrypt connection info", err.Error())
+		} else if len(connection.Host) > 0 {
+			storeConnection(w, connection.Host)
+		} else {
+			createAlertDialog(w, "Host not given", "Host needs to be http://<domain>:<port>")
 		}
-		//createAlertDialog(w, "juu", "tesmos")
-		connections, _ := getInfluxDBConfigs(w, databaseHandler)
-		/*fmt.Println("connections: %v", connections)
-		connectionsJSON, _ := json.Marshal(connections)
-		data = fmt.Sprintf("window.connections=%s", connectionsJSON)
-		w.Eval(data)*/
-		popluateConnections(w, connections)
-		//createAlertDialog(w, "Connections", "jee")
 	default:
 		createAlertDialog(w, "Default", "nothing happened")
 		/*case strings.HasPrefix(data, "connectInfluxDB:"):

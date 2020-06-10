@@ -16,6 +16,10 @@ window.rpc = {
     console.log("Values loaded from db");*/
     return this.connections 
   },
+  storeConnection: function(host){
+    console.log("sending... "+host)
+    window.external.invoke(JSON.stringify({cmd : 'addCon', host: host}))
+  }
 };
 
 /*window.getInfluxDBConnections = function (){

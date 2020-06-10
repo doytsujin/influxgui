@@ -5,7 +5,7 @@ export default {
         selected: '',
         modalIsVisible: "hidden",
         choices: [],
-        
+        newConnection: "",
       }
     },
     methods: {
@@ -27,6 +27,20 @@ export default {
         }
         this.selected="";
         this.modalIsVisible = val;
+      },
+      createNewConnection: function(e, ){
+        console.log("Connection: "+this.newConnection);
+        if(!this.choices.includes(this.newConnection)){
+          this.choices.push(this.newConnection);
+          this.Rpc.storeConnection(this.newConnection);
+        }
+        else {
+          alert("Connection: "+this.newConnection+" was already in db");
+        }
+        this.newConnection = "";
+        this.toggleModal(false);
+        e.preventDefault();
+        return false;
       }
     },
     beforeMount(){
@@ -53,7 +67,6 @@ export default {
                 <option value="new">New connection</option>
               </select>
             </li>
-            <li><span>Selected: {{ selected }}</span></li>
             <li>Help</li></ul>
         </div>
       </header>
@@ -62,7 +75,11 @@ export default {
           <!-- Modal content -->
           <div class="modal-content">
             <span class="close" v-on:click="toggleModal(false)">&times;</span>
-            <p>Some text in the Modal..</p>
+            <div>
+              <form @submit="createNewConnection">
+              <input type="text" v-model="newConnection" placeholder="http://domain:port" /> <input type="submit" value="Create new connection" />
+              </form>
+            </div>
           </div>
         
         </div>
