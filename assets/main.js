@@ -1,4 +1,3 @@
-var connections = ["a", "b"];
 window.rpc = {
   askConnections: function() { 
     this.connections = [];
@@ -8,31 +7,16 @@ window.rpc = {
     this.connections = connections;
   },
   getConnections: function() { 
-    /*console.log("Get connections called")
-    if(this.connections != null && this.connections.length == 0){
-      setTimeout(this.getConnections, 10);
-      return;
-    }
-    console.log("Values loaded from db");*/
     return this.connections 
   },
   storeConnection: function(host){
     console.log("sending... "+host)
     window.external.invoke(JSON.stringify({cmd : 'addCon', host: host}))
+  },
+  setHost: function(host){
+    window.external.invoke(JSON.stringify({cmd : 'setHost', host: host}));
   }
 };
-
-/*window.getInfluxDBConnections = function (){
-  window.rpc.getConnections();
-  console.log("From window function");
-  console.log(window.rpc.connections);
-  return window.rpc.connections;
-}*/
-//window.rpc.askConnections();
-//window.rpc.getConnections();
-
-//console.log(rpc.getConnections());
-//console.log(getInfluxDBConnections());
 
 import App from './components/App.js';
 Vue.prototype.Rpc = window.rpc;

@@ -52,6 +52,9 @@ export default {
         if(val == "new"){
           this.toggleModal(true);
         }
+        else {
+          this.Rpc.setHost(val);
+        }
       },
     },
     template: `

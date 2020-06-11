@@ -41,6 +41,10 @@ func handleRPC(w webview.WebView, data string) {
 		} else {
 			createAlertDialog(w, "Host not given", "Host needs to be http://<domain>:<port>")
 		}
+	case "setHost":
+		if err := json.Unmarshal([]byte(data), &connectionConfig); err != nil {
+			createAlertDialog(w, "Could not set host", err.Error())
+		}
 	default:
 		createAlertDialog(w, "Default", "nothing happened")
 		/*case strings.HasPrefix(data, "connectInfluxDB:"):
