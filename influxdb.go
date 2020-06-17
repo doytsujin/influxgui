@@ -5,7 +5,8 @@ import (
 	"container/list"
 	"fmt"
 	"strings"
-	"github.com/influxdata/influxdb1-client/v2"
+
+	client "github.com/influxdata/influxdb1-client/v2"
 )
 
 var dblog *list.List
@@ -83,7 +84,7 @@ func runInfluxDBQuery(query string, database string) (bool, string) {
 		}
 
 		data = createInfluxDBQueryResponse(results)
-	} else if (response.Error() != nil && err == nil){
+	} else if response.Error() != nil && err == nil {
 		response_error := fmt.Sprintf("%v", response)
 		response_error = strings.Trim(response_error, "&{[] ")
 		response_error = strings.Trim(response_error, "}")
@@ -107,13 +108,13 @@ func showDatabases() (bool, string) {
 
 	q := client.NewQuery("SHOW DATABASES;", "", "ns")
 	if response, err := influxdbClient.Query(q); err == nil && response.Error() == nil {
-		dbs := "<option value=''>Database</option>"
+		dbs := "["
 		for _, value := range response.Results[0].Series[0].Values {
 			res := value[0]
-			option := fmt.Sprintf("<option value='%s'>%s</option>", res, res)
-			dbs = fmt.Sprintf("%s%s", dbs, option)
+			option := fmt.Sprintf("%s,%s,", res, res)
+			dbs = fmt.Sprintf("%s%s];", dbs, option)
 		}
-		data = fmt.Sprintf("document.getElementById('inluxdb_db').innerHTML = \"%s\";", dbs)
+		data = fmt.Sprintf("window.rpc.databases=\"%s\";", dbs)
 	}
 	return status, data
 }

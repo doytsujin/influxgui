@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 
 	"github.com/zserge/webview"
@@ -45,6 +46,21 @@ func handleRPC(w webview.WebView, data string) {
 		if err := json.Unmarshal([]byte(data), &connectionConfig); err != nil {
 			createAlertDialog(w, "Could not set host", err.Error())
 		}
+	case "connectInflux":
+		if err := json.Unmarshal([]byte(data), &connectionConfig); err != nil {
+			createAlertDialog(w, "Could not connect influxdb", err.Error())
+		}
+		fmt.Println("*****, %v, %v, %v", connectionConfig.Host, connectionConfig.Username, connectionConfig.Password)
+		res, msg := pingInfluxDB()
+		if !res {
+			createAlertDialog(w, connectionConfig.Host, msg)
+		}
+		res, data := showDatabases()
+		if !res {
+			createAlertDialog(w, data, "")
+			return
+		}
+		w.Eval("window.rpc.connected=true;")
 	default:
 		createAlertDialog(w, "Default", "nothing happened")
 		/*case strings.HasPrefix(data, "connectInfluxDB:"):

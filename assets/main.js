@@ -15,7 +15,13 @@ window.rpc = {
   },
   setHost: function(host){
     window.external.invoke(JSON.stringify({cmd : 'setHost', host: host}));
-  }
+  },
+  connectInfluxDB: function(username, password){
+    window.external.invoke(JSON.stringify({cmd: 'connectInflux', username: username, password, password}));
+  },
+  results: [],
+  databases: [],
+  connected: false,
 };
 
 import App from './components/App.js';
